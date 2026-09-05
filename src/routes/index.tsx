@@ -1,24 +1,52 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
+import { GameScreen, HomeScreen, LevelSelectScreen } from "@/components/anotha/screens";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "ANOTHA — Pamuk Vadisi'nde Yumuşak Bir Macera" },
+      {
+        name: "description",
+        content:
+          "ANOTHA ana menüsü, Pamuk Vadisi bölüm haritası ve mola ekranı — pastel, premium bir mobil platform oyunu prototipi.",
+      },
+      { property: "og:title", content: "ANOTHA" },
+      {
+        property: "og:description",
+        content:
+          "Pastel bulutlar ve yumuşak vadiler arasında geçen premium bir mobil platform oyunu prototipi.",
+      },
+    ],
+  }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
+type Screen = "home" | "levels" | "game";
+
 function Index() {
+  const [screen, setScreen] = useState<Screen>("home");
+
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <div className="flex min-h-dvh items-center justify-center bg-background sm:py-6">
+      {/* phone frame on larger screens, full-bleed on mobile */}
+      <div className="relative h-dvh w-full overflow-hidden bg-background sm:h-[844px] sm:max-h-[92dvh] sm:w-[390px] sm:rounded-[44px] sm:border-[6px] sm:border-surface sm:shadow-[var(--shadow-panel)]">
+        <div key={screen} className="h-full animate-fade-up">
+          {screen === "home" && (
+            <HomeScreen
+              onContinue={() => setScreen("game")}
+              onExplore={() => setScreen("levels")}
+            />
+          )}
+          {screen === "levels" && (
+            <LevelSelectScreen
+              onBack={() => setScreen("home")}
+              onPlay={() => setScreen("game")}
+            />
+          )}
+          {screen === "game" && <GameScreen onExit={() => setScreen("home")} />}
+        </div>
+      </div>
     </div>
   );
 }
